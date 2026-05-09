@@ -503,12 +503,26 @@ SUBDIRS += yaASM yaOBC
 SUBDIRS += yaLVDC
 SUBDIRS += $(MISSIONS)
 
-# Detect if wx-config is available. If not, and NOGUI is not set, 
-# we'll have to skip the GUI-related subdirectories.
+# Detect if GUI dependencies (wx-config, allegro-config, sdl-config) are available.
+# If not, and NOGUI is not set, we'll have to skip the GUI-related subdirectories.
 ifeq ($(NOGUI),)
   WX_CONFIG := $(shell which wx-config 2>/dev/null || which wx-config-3.0 2>/dev/null || which wx-config-3.2 2>/dev/null)
+  ALLEGRO_CONFIG := $(shell which allegro-config 2>/dev/null)
+  SDL_CONFIG := $(shell which sdl-config 2>/dev/null)
   ifeq ($(WX_CONFIG),)
-    $(warning wx-config not found. GUI components will be skipped. Install libwxgtk3.2-dev or similar to enable.)
+    $(warning wx-config not found. GUI components will be restricted.)
+    NOGUI_INTERNAL := yes
+  endif
+  ifeq ($(ALLEGRO_CONFIG),)
+    $(warning allegro-config not found. GUI components will be restricted.)
+    NOGUI_INTERNAL := yes
+  endif
+  ifeq ($(SDL_CONFIG),)
+    $(warning sdl-config not found. GUI components will be restricted.)
+    NOGUI_INTERNAL := yes
+  endif
+  ifdef NOGUI_INTERNAL
+    $(warning One or more GUI dependencies (wxWidgets, Allegro, SDL) are missing. GUI tools will be skipped.)
     NOGUI := yes
   endif
 endif
