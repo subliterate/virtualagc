@@ -503,6 +503,16 @@ SUBDIRS += yaASM yaOBC
 SUBDIRS += yaLVDC
 SUBDIRS += $(MISSIONS)
 
+# Detect if wx-config is available. If not, and NOGUI is not set, 
+# we'll have to skip the GUI-related subdirectories.
+ifeq ($(NOGUI),)
+  WX_CONFIG := $(shell which wx-config 2>/dev/null || which wx-config-3.0 2>/dev/null || which wx-config-3.2 2>/dev/null)
+  ifeq ($(WX_CONFIG),)
+    $(warning wx-config not found. GUI components will be skipped. Install libwxgtk3.2-dev or similar to enable.)
+    NOGUI := yes
+  endif
+endif
+
 ifndef NOGUI
 ifeq "$(YADEDA_SUFFIX)" ""
 SUBDIRS += yaDEDA/src
